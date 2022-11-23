@@ -88,21 +88,31 @@ class App(QWidget):
 
             # print(image_concat[i])
         if option == 1:
-            for allPixel in imageConcat[1:]:
-                for lignePixel in range(len(allPixel)):
-                    for pixel in range(len(allPixel[lignePixel])):
-                        copieImage[lignePixel][pixel] += allPixel[lignePixel][pixel]
-                    
+            imageConcat = [fits.getdata(image) for image in listImage]
+            copieImage = []
 
-            for lignePixel in range(len(copieImage)):  # type: ignore
-                for pixel in range(len(copieImage[lignePixel])):  # type: ignore
-                    copieImage[lignePixel][pixel] = copieImage[lignePixel][pixel] / len(imageConcat)  # type: ignore
+
+            #copie de la structure de la premiere image en mettant une liste a chaque pixel
+            for ligne in range(len(imageConcat[0])):
+                copieImage.append([])
+                for pixel in imageConcat[0][ligne]:
+                    copieImage[ligne].append([])
+
+            #ajout de toutes les valeurs dans une liste pour chaque pixel
+            for image in imageConcat:
+                for ligne in range(len(image)):
+                    for pixel in range(len(image[ligne])):
+                        copieImage[ligne][pixel].append(image[ligne][pixel])
+
+            # calcul de la moyenne
+            for ligne in copieImage:
+                for pixel in range(len(ligne)):
+                    ligne[pixel] = np.mean(ligne[pixel])
 
         #médiane
         elif option == 2:
             imageConcat = [fits.getdata(image) for image in listImage]
             copieImage = []
-
 
             #copie de la structure de la premiere image
             for ligne in range(len(imageConcat[0])):
@@ -124,14 +134,11 @@ class App(QWidget):
                     new_valeur = ligne[pixel][a]
                     ligne[pixel] = new_valeur
         
-
         plt.imshow(copieImage, cmap='gray')  # type: ignore
         plt.colorbar()
         # plt.show()
         
         self.canvas.draw()
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
