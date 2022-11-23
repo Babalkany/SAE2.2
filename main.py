@@ -3,7 +3,7 @@
 # software qt qui combine des images en .fits   #
 # @author: Bastien BRUNEL & Tom LECLERCQ        #
 # 22/11/2022                                    #
-# V1.2 choix median / moyenne dans qt           #
+# V1.3 choix median / moyenne dans qt           #
 #################################################
 
 #import qt
@@ -82,10 +82,9 @@ class App(QWidget):
             self.liste.append(files)
     
     def chargerAllImages(self, listImage, option=1):
-        self.figure.clear()
         imageConcat = [fits.getdata(image) for image in listImage]
         copieImage = imageConcat[0]
-
+        self.figure.clear()
 
             # print(image_concat[i])
         if option == 1:
@@ -101,25 +100,35 @@ class App(QWidget):
 
         #médiane
         elif option == 2:
-            listAllPixel = []
-            for allPixel in imageConcat[0:]:
-                for lignePixel in range(len(allPixel)):  # type: ignore
-                    for pixel in range(len(allPixel[lignePixel])):  # type: ignore
-                        listAllPixel.append(allPixel[lignePixel][pixel])  # type: ignore
+            imageConcat = [fits.getdata(image) for image in listImage]
+            copieImage = []
+
+
+            #copie de la structure de la premiere image
+            for ligne in range(len(imageConcat[0])):
+                copieImage.append([])
+                for pixel in imageConcat[0][ligne]:
+                    copieImage[ligne].append([])
+
+
+            for image in imageConcat:
+                for ligne in range(len(image)):
+                    for pixel in range(len(image[ligne])):
+                        copieImage[ligne][pixel].append(image[ligne][pixel])
+
+            for ligne in copieImage:
+                for pixel in range(len(ligne)):
+                    # print(type(ligne[pixel]))
+                    ligne[pixel].sort()
+                    a = len(ligne[pixel])//2
+                    new_valeur = ligne[pixel][a]
+                    ligne[pixel] = new_valeur
         
-         
-            listAllPixelTriee = sorted(listAllPixel) 
-            
-            milieu = listAllPixelTriee[(len(listAllPixelTriee)-1)//2]
-            
-            for lignePixel in range(len(copieImage)):  # type: ignore
-                for pixel in range(len(copieImage[lignePixel])):  # type: ignore
-                    copieImage[lignePixel][pixel] = milieu            # type: ignore
-        print(copieImage)
 
         plt.imshow(copieImage, cmap='gray')  # type: ignore
         plt.colorbar()
         # plt.show()
+        
         self.canvas.draw()
 
 
@@ -129,5 +138,3 @@ if __name__ == '__main__':
     ex = App()
     ex.show()
     sys.exit(app.exec_())
-
-
