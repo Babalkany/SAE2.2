@@ -88,9 +88,10 @@ class App(QWidget):
 
             # print(image_concat[i])
         if option == 1:
-            imageConcat = [fits.getdata(image) for image in listImage]
+            # imageConcat = [fits.getdata(image) for image in listImage]
             copieImage = []
 
+            # print(copieImage)
 
             #copie de la structure de la premiere image en mettant une liste a chaque pixel
             for ligne in range(len(imageConcat[0])):
@@ -98,16 +99,16 @@ class App(QWidget):
                 for pixel in imageConcat[0][ligne]:
                     copieImage[ligne].append([])
 
-            #ajout de toutes les valeurs dans une liste pour chaque pixel
-            for image in imageConcat:
-                for ligne in range(len(image)):
-                    for pixel in range(len(image[ligne])):
+            # print(copieImage[0][0])
+            # temp = []
+            for ligne in range(len(copieImage)):
+                for pixel in range(len(copieImage[ligne])):
+                    for image in imageConcat[1:]:
                         copieImage[ligne][pixel].append(image[ligne][pixel])
+                    copieImage[ligne][pixel] = sum(copieImage[ligne][pixel])/len(imageConcat)
+                    # temp=[]
 
-            # calcul de la moyenne
-            for ligne in copieImage:
-                for pixel in range(len(ligne)):
-                    ligne[pixel] = np.mean(ligne[pixel])
+            # print(copieImage[0][0])
 
         #médiane
         elif option == 2:
