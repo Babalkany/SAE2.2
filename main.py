@@ -103,7 +103,7 @@ class App(QWidget):
             # temp = []
             for ligne in range(len(copieImage)):
                 for pixel in range(len(copieImage[ligne])):
-                    for image in imageConcat[1:]:
+                    for image in imageConcat:
                         copieImage[ligne][pixel].append(image[ligne][pixel])
                     copieImage[ligne][pixel] = sum(copieImage[ligne][pixel])/len(imageConcat)
                     # temp=[]
