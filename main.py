@@ -1,29 +1,38 @@
-#################################################
-# SAE 2.2 développement efficace                #
-# software qt qui combine des images en .fits   #
-# @author: Bastien BRUNEL & Tom LECLERCQ        #
-# 22/11/2022                                    #
-# V1.3 choix median / moyenne dans qt           #
-#################################################
+"""
+<p>
+SAE 2.2 développement efficace <br>
+software PyQt5 qui combine des images en .fits <br>
+lire le Readme.md pour plus d'informations sur le contenu et l'installation des bibliothèques associées <br>
+@author: Bastien BRUNEL & Tom LECLERCQ <br>
+22/11/2022 <br>
+V1.3 choix median / moyenne dans qt <br>
+COPYRIGHT <br>
+</p>
+"""
+
 
 #import qt
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QLabel, QVBoxLayout, QPushButton
-from PyQt5.QtGui import QImage 
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-#import astropy
+#import numpy
 import numpy as np
+
+#import matplotlib
 import matplotlib.pyplot as plt
+
+#import astropy
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
 
-#var globales test
-test = [['C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0001.fits', 
-'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0002.fits', 
-'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0003.fits', 
-'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0004.fits', 
-'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0005.fits']]
+#var globales test--------------------------------------------------------------------------------------#
+test = [['C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0001.fits',  #
+'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0002.fits',           #
+'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0003.fits',           #
+'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0004.fits',           #
+'C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0005.fits']]          #
+#-------------------------------------------------------------------------------------------------------#
 
 class App(QWidget):
     def __init__(self):
@@ -88,10 +97,9 @@ class App(QWidget):
 
             # print(image_concat[i])
         if option == 1:
-            # imageConcat = [fits.getdata(image) for image in listImage]
+            imageConcat = [fits.getdata(image) for image in listImage]
             copieImage = []
 
-            # print(copieImage)
 
             #copie de la structure de la premiere image en mettant une liste a chaque pixel
             for ligne in range(len(imageConcat[0])):
@@ -99,16 +107,16 @@ class App(QWidget):
                 for pixel in imageConcat[0][ligne]:
                     copieImage[ligne].append([])
 
-            # print(copieImage[0][0])
-            # temp = []
-            for ligne in range(len(copieImage)):
-                for pixel in range(len(copieImage[ligne])):
-                    for image in imageConcat:
+            #ajout de toutes les valeurs dans une liste pour chaque pixel
+            for image in imageConcat:
+                for ligne in range(len(image)):
+                    for pixel in range(len(image[ligne])):
                         copieImage[ligne][pixel].append(image[ligne][pixel])
-                    copieImage[ligne][pixel] = sum(copieImage[ligne][pixel])/len(imageConcat)
-                    # temp=[]
 
-            # print(copieImage[0][0])
+            # calcul de la moyenne
+            for ligne in copieImage:
+                for pixel in range(len(ligne)):
+                    ligne[pixel] = np.mean(ligne[pixel])
 
         #médiane
         elif option == 2:
@@ -120,7 +128,6 @@ class App(QWidget):
                 copieImage.append([])
                 for pixel in imageConcat[0][ligne]:
                     copieImage[ligne].append([])
-
 
             for image in imageConcat:
                 for ligne in range(len(image)):
