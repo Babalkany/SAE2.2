@@ -2,13 +2,13 @@
 # SAE 2.2 développement efficace                #
 # software qt qui combine des images en .fits   #
 # @author: Bastien BRUNEL & Tom LECLERCQ        #
-# 22/11/2022                                    #
-# V1.3 choix median / moyenne dans qt           #
+# 15/12/2022                                    #
+# V1.5 ajout du calcul des outlers              #
 #################################################
 
 #import qt
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QLabel, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QCheckBox, QVBoxLayout, QPushButton, QLabel
 from PyQt5.QtGui import QImage 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -16,7 +16,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from astropy.utils.data import get_pkg_data_filename
+from astropy.stats import sigma_clip, mad_std
 from scipy import stats
 
 #var globales test
@@ -30,6 +30,10 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         
+        #label
+        self.label = QLabel("Choisir une méthode de calcul")
+
+
         # attribut liste des chemins d'images
         self.liste = []
         self.setWindowTitle('SAE 2.2')
@@ -40,18 +44,22 @@ class App(QWidget):
 
         # création d'un petit layout rapide
         layout = QVBoxLayout()
+        layout.addWidget(self.label)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
         # création boutons 
         self.btnAvg = QPushButton("Moyenne")
         self.btnMed = QPushButton("Médiane")
+        self.check = QCheckBox("éliminer les ouliers ?")
+        
 
         # création connexions bouton/méthode
         self.btnMed.clicked.connect(self.btnMedClicked)
         self.btnAvg.clicked.connect(self.btnAvgClicked)
 
         # layout 2 le retour
+        layout.addWidget(self.check)
         layout.addWidget(self.btnAvg)
         layout.addWidget(self.btnMed)
 
@@ -91,35 +99,29 @@ class App(QWidget):
     #     return liste
                 
     def chargerAllImages(self, listImage, option=1):
-        
         imageConcat = [fits.getdata(image) for image in listImage]
-        
-        
-        
         self.figure.clear()
-    
 
         if option == 1:
             copieImage = np.mean(imageConcat, axis=0)
-            # print(copieImage.shape)
-            # imageFinal = stats.zscore(copieImage)
-            
-      
+            if self.check.isChecked():
+                copieImage = sigma_clip(copieImage, sigma=3, maxiters=1, stdfunc=mad_std)
+                self.label.setText("Empilement par moyenne avec rejet des outliers")
+            else:
+                self.label.setText("Empilement par moyenne simple")
 
         #médiane
         elif option == 2:
             copieImage = np.median(imageConcat, axis=0)
-            # imageFinal = stats.zscore(copieImage)
-        
-        
-        
+            if self.check.isChecked():
+                copieImage =  sigma_clip(copieImage, sigma=3, maxiters=1, stdfunc=mad_std)
+                self.label.setText("Empilement par médiane avec rejet des outliers")
+            else:
+                self.label.setText("Empilement par médiane simple")
+
         plt.imshow(copieImage, cmap='gray')
         plt.colorbar()
-        # plt.show()
-        
         self.canvas.draw()
-        
-        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
