@@ -103,23 +103,35 @@ class App(QWidget):
         self.figure.clear()
 
         if option == 1:
-            copieImage = np.mean(imageConcat, axis=0)
+            Image = np.mean(imageConcat, axis=0)
             if self.check.isChecked():
-                copieImage = sigma_clip(copieImage, sigma=3, maxiters=1, stdfunc=mad_std)
+                copieImage = sigma_clip(Image, sigma=2.85, maxiters=1, cenfunc='mean')
+                
+                for i in range(len(copieImage)):
+                    for y in range(len(copieImage[i])):
+                        if copieImage[i][y] != Image[i][y]:
+                            copieImage[i][y] = np.mean(Image[i+1][y-1], Image[i+1][y], Image[i+1][y+1], Image[i][y-1], Image[i][y], Image[i][y+1], Image[i-1][y-1], Image[i-1][y], Image[i-1][y+1])
+
                 self.label.setText("Empilement par moyenne avec rejet des outliers")
             else:
                 self.label.setText("Empilement par moyenne simple")
 
         #médiane
         elif option == 2:
-            copieImage = np.median(imageConcat, axis=0)
+            Image = np.median(imageConcat, axis=0)
             if self.check.isChecked():
-                copieImage =  sigma_clip(copieImage, sigma=3, maxiters=1, stdfunc=mad_std)
+                copieImage =  sigma_clip(Image, sigma=3, maxiters=1, cenfunc='mean')
+                
+                for i in range(len(copieImage)):
+                    for y in range(len(copieImage[i])):
+                        if copieImage[i][y] != Image[i][y]:
+                            copieImage[i][y] = np.mean(Image[i+1][y-1], Image[i+1][y], Image[i+1][y+1], Image[i][y-1], Image[i][y], Image[i][y+1], Image[i-1][y-1], Image[i-1][y], Image[i-1][y+1])
+
                 self.label.setText("Empilement par médiane avec rejet des outliers")
             else:
                 self.label.setText("Empilement par médiane simple")
 
-        plt.imshow(copieImage, cmap='gray')
+        plt.imshow(Image, cmap='gray')
         plt.colorbar()
         self.canvas.draw()
 
