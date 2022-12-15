@@ -82,13 +82,13 @@ class App(QWidget):
         if files:
             self.liste.append(files)
             
-    def calculIncoherence(self, ListPixel):
-        liste = []
-        m = np.mean(ListPixel)
-        for i in ListPixel:
-            if i < m+3*np.std(ListPixel) and i > m-3*np.std(ListPixel):
-                liste.append(i)
-        return liste
+    # def calculIncoherence(self, ListPixel):
+    #     liste = []
+    #     m = np.mean(ListPixel)
+    #     for i in ListPixel:
+    #         if i < m+3*np.std(ListPixel) and i > m-3*np.std(ListPixel):
+    #             liste.append(i)
+    #     return liste
                 
     def chargerAllImages(self, listImage, option=1):
         
@@ -99,22 +99,21 @@ class App(QWidget):
         self.figure.clear()
     
 
-            # print(image_concat[i])
         if option == 1:
             copieImage = np.mean(imageConcat, axis=0)
-            print(copieImage.shape)
-            imageFinal = stats.zscore(copieImage)
+            # print(copieImage.shape)
+            # imageFinal = stats.zscore(copieImage)
             
       
 
         #médiane
         elif option == 2:
             copieImage = np.median(imageConcat, axis=0)
-            imageFinal = stats.zscore(copieImage)
+            # imageFinal = stats.zscore(copieImage)
         
         
         
-        plt.imshow(copieImage)
+        plt.imshow(copieImage, cmap='gray')
         plt.colorbar()
         # plt.show()
         
