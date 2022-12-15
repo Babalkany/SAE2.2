@@ -55,3 +55,7 @@ Pour exécuter notre programme il faut simplement exécuter le fichier ``main.py
 - **Empilement par moyenne** en cliquant sur le bouton correspondant en bas de la fenêtre PyQt5.
 - **Empilement par médiane** en cliquant sur le bouton correspondant en bas de la fenêtre PyQt5.
 - ~~Empilement avec rejet des *outliers* **(en Cours)** de manière automatique au lancement du code et avec les 2 méthodes~~
+
+## PYDOC
+## PYDOC
+## PYDOC
