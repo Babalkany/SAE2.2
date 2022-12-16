@@ -3,8 +3,8 @@
 # SAE 2.2 développement efficace                #
 # software qt qui combine des images en .fits   #
 # @author: Bastien BRUNEL & Tom LECLERCQ        #
-# 15/12/2022                                    #
-# V1.5 ajout du calcul des outlers              #
+# 16/12/2022                                    #
+# V1.7 prise en compte image en couleur         #
 #################################################
 
 #import qt
@@ -108,20 +108,32 @@ class App(QWidget):
         # je toutes les données de chaque image dans la variable imageConcat
         imageConcat = [fits.getdata(image) for image in listImage]
         
+        # je clear la figure 
+        self.figure.clear()
+        
+        Image = []
+        if len(imageConcat[0])==3:
+            for i in range(len(imageConcat)):
+                Image.append(imageConcat[i][0]+imageConcat[i][1]+imageConcat[i][2])
+                cmap=None
+        else:
+            Image = imageConcat
+            cmap='gray'
+        
     
         imageSansValeurAberrante = []
     
         # Pour chaque image dans imageConcat
-        for i in imageConcat:
+        for i in Image:
                 imageSansValeurAberrante.append(sigma_clip(i, sigma=2.85, maxiters=1)) # je stocke récupère les données de l'image sans les valeurs aberrantes
         
-        # je clear la figure 
-        self.figure.clear()
+
+
 
         # Si l'option vaut 1
         if option == 1:
             # je fais l'empilement par moyenne
-            copieImage = np.mean(imageConcat, axis=0)
+            copieImage = np.mean(Image, axis=0)
             # si la case est cochée
             if self.check.isChecked():
                 # je fais l'empilement par moyenne sans les valeurs aberrantes
@@ -133,7 +145,7 @@ class App(QWidget):
          # Si l'option vaut 1
         elif option == 2:
             # je fais l'empilement par médiane
-            copieImage = np.median(imageConcat, axis=0)
+            copieImage = np.median(Image, axis=0)
              # si la case est cochée
             if self.check.isChecked():
                  # je fais l'empilement par médiane sans les valeurs aberrantes
@@ -143,7 +155,7 @@ class App(QWidget):
             else:
                 self.label.setText("Empilement par médiane simple")
 
-        plt.imshow(copieImage, cmap='gray') # j'affiche l'image
+        plt.imshow(copieImage, cmap) # j'affiche l'image
         plt.colorbar() # j'affiche la color bar sur le coté de l'image
         self.canvas.draw() # je l'ajoute au canvas
 
