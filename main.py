@@ -1,3 +1,4 @@
+
 #################################################
 # SAE 2.2 développement efficace                #
 # software qt qui combine des images en .fits   #
@@ -16,8 +17,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from astropy.stats import sigma_clip, mad_std
-from scipy import stats
+from astropy.stats import sigma_clip
+# from scipy import stats
+
 
 #var globales test
 test = [['C:/Users/Vidox/OneDrive/Documents/Cours/2/S3/SAE/C2/fits_tests/M13_blue/M13_blue_0001.fits', 
@@ -85,55 +87,65 @@ class App(QWidget):
         """
         méthode qui charge plusieurs fichiers et les ajoutes directement dans self.liste
         """
-        #                          widget parent, label explication, chemin ou ouvrir la boite de dialogue, type de fichier a ouvrir
+        #                        widget parent, label explication, chemin ou ouvrir la boite de dialogue, type de fichier a ouvrir
         files, _ = QFileDialog.getOpenFileNames(self,"Select one or more files to open", "","Images (*.fits / *.fit)")
         if files:
             self.liste.append(files)
-            
-    # def calculIncoherence(self, ListPixel):
-    #     liste = []
-    #     m = np.mean(ListPixel)
-    #     for i in ListPixel:
-    #         if i < m+3*np.std(ListPixel) and i > m-3*np.std(ListPixel):
-    #             liste.append(i)
-    #     return liste
+
                 
-    def chargerAllImages(self, listImage, option=1):
+    def chargerAllImages(self, listImage : list, option=1):
+        """Cette fonction permet d'empiler les images et d'afficher le résultat
+        Il y a deux types d'empilement : 
+            - empilement par moyenne 
+            - empilement par médiane 
+
+        On peut aussi supprimer les valeurs aberrantes en cochant la checkbox 
+
+        Args:
+            listImage (list): liste contenant toutes les images à empiler
+            option (int, optional): option permet de différencier la moyenne et la médiane. Defaults to 1.
+        """
+        # je toutes les données de chaque image dans la variable imageConcat
         imageConcat = [fits.getdata(image) for image in listImage]
+        
+    
+        imageSansValeurAberrante = []
+    
+        # Pour chaque image dans imageConcat
+        for i in imageConcat:
+                imageSansValeurAberrante.append(sigma_clip(i, sigma=2.85, maxiters=1)) # je stocke récupère les données de l'image sans les valeurs aberrantes
+        
+        # je clear la figure 
         self.figure.clear()
 
+        # Si l'option vaut 1
         if option == 1:
-            Image = np.mean(imageConcat, axis=0)
+            # je fais l'empilement par moyenne
+            copieImage = np.mean(imageConcat, axis=0)
+            # si la case est cochée
             if self.check.isChecked():
-                copieImage = sigma_clip(Image, sigma=2.85, maxiters=1, cenfunc='mean')
-                
-                for i in range(len(copieImage)):
-                    for y in range(len(copieImage[i])):
-                        if copieImage[i][y] != Image[i][y]:
-                            copieImage[i][y] = np.mean(Image[i+1][y-1], Image[i+1][y], Image[i+1][y+1], Image[i][y-1], Image[i][y], Image[i][y+1], Image[i-1][y-1], Image[i-1][y], Image[i-1][y+1])
-
+                # je fais l'empilement par moyenne sans les valeurs aberrantes
+                copieImage = np.mean(imageSansValeurAberrante, axis=0)
                 self.label.setText("Empilement par moyenne avec rejet des outliers")
             else:
                 self.label.setText("Empilement par moyenne simple")
 
-        #médiane
+         # Si l'option vaut 1
         elif option == 2:
-            Image = np.median(imageConcat, axis=0)
+            # je fais l'empilement par médiane
+            copieImage = np.median(imageConcat, axis=0)
+             # si la case est cochée
             if self.check.isChecked():
-                copieImage =  sigma_clip(Image, sigma=3, maxiters=1, cenfunc='mean')
-                
-                for i in range(len(copieImage)):
-                    for y in range(len(copieImage[i])):
-                        if copieImage[i][y] != Image[i][y]:
-                            copieImage[i][y] = np.mean(Image[i+1][y-1], Image[i+1][y], Image[i+1][y+1], Image[i][y-1], Image[i][y], Image[i][y+1], Image[i-1][y-1], Image[i-1][y], Image[i-1][y+1])
-
+                 # je fais l'empilement par médiane sans les valeurs aberrantes
+                copieImage =  np.median(imageSansValeurAberrante, axis=0)
+                    
                 self.label.setText("Empilement par médiane avec rejet des outliers")
             else:
                 self.label.setText("Empilement par médiane simple")
 
-        plt.imshow(Image, cmap='gray')
-        plt.colorbar()
-        self.canvas.draw()
+        plt.imshow(copieImage, cmap='gray') # j'affiche l'image
+        plt.colorbar() # j'affiche la color bar sur le coté de l'image
+        self.canvas.draw() # je l'ajoute au canvas
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
