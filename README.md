@@ -51,11 +51,9 @@ Pour exécuter notre programme il faut simplement exécuter le fichier ``main.py
 
 ## Résumé des fonctionnalités
 
-- **Charger les images en .fits** **(en niveau de gris)** dans le code grâce a une interface graphique en les sélectionnant dans l'onglet qui s'affiche.
+- **Charger les images en .fits/.fit** **(en niveau de gris et en couleur)** dans le code grâce à une interface graphique en les sélectionnant dans l'onglet qui s'affiche. Le programme reconnaît automatiquement les images en couleur des images en niveau de gris. 
 - **Empilement par moyenne** en cliquant sur le bouton correspondant en bas de la fenêtre PyQt5.
 - **Empilement par médiane** en cliquant sur le bouton correspondant en bas de la fenêtre PyQt5.
-- ~~Empilement avec rejet des *outliers* **(en Cours)** de manière automatique au lancement du code et avec les 2 méthodes~~
+Les 2 méthodes d'empilements sont compatibles avec le rejet des outliers, pour activer cette fonctionnalité il faut cocher la checkbox aux dessus des boutons du bas. 
 
-## PYDOC
-## PYDOC
-## PYDOC
+Pour plus de détails sur l'utilisation des fonctions du code, vous pouvez vous référer à la documentation pydoc à la racine du dépôt.
